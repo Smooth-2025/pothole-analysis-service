@@ -1,9 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mariadb://${DB_HOST:127.0.0.1}:${DB_PORT:3306}/${DB_NAME:driving_analysis_db}?serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+    url: ${DB_URL:jdbc:mysql://smooth-database.c92iu2og4xc3.ap-northeast-2.rds.amazonaws.com:3306/pothole_analysis?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    username: smooth_admin
+    password: smooth_admin
+    driver-class-name: com.mysql.cj.jdbc.Driver
   jpa:
     hibernate:
       ddl-auto: update
