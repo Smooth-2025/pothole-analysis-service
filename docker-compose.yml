@@ -1,0 +1,36 @@
+services:
+  # MySQL 데이터베이스 컨테이너 정의
+  mysql:
+    image: mysql:8.0
+    container_name: smooth-mysql
+    environment:
+      MYSQL_DATABASE: ${RDS_URL}
+      MYSQL_USER: ${RDS_USERNAME}
+      MYSQL_PASSWORD: ${RDS_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    restart: unless-stopped
+
+  # 백엔드 애플리케이션 컨테이너 정의 (수정)
+  backend:
+    # 도커 허브 이미지를 사용하도록 지정
+    #image: 131c/user-service:0.0.1
+    # ECR 이미지를 사용하도록 지정
+    image: 933090817123.dkr.ecr.ap-northeast-2.amazonaws.com/smooth/pothole-analysis-service:0.0.1
+    container_name: smooth-backend
+    ports:
+      - "8080:8080"
+    # MySQL 컨테이너가 먼저 실행되도록 의존성 설정
+    depends_on:
+      - mysql
+    # 환경 변수 설정
+    environment:
+      # application-prod.yml 파일을 사용하도록 지정
+      - spring.profiles.active=prod
+    restart: unless-stopped
+
+# 데이터 영속성을 위한 볼륨 정의
+volumes:
+  mysql_data:
