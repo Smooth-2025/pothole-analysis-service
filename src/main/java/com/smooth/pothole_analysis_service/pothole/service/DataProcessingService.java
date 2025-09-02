@@ -15,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DataProcessingService {
 
     private final AthenaQueryService athenaQueryService;
-    private final PotholeService PotholeService;
+    private final PotholeService potholeService;
 
     // S3 → Athena 쿼리 (조건문) → RDS 저장 파이프라인
     @Transactional
@@ -36,14 +36,14 @@ public class DataProcessingService {
             }
 
             // 3. RDS에 데이터 저장
-            PotholeService.saveQueryResults(queryExecutionId, queryResults);
+            potholeService.saveQueryResults(queryExecutionId, queryResults);
             log.info("RDS에 {} 건의 데이터 저장 완료", queryResults.size());
 
             // 4. 저장 결과 확인
-            long totalCount = PotholeService.getTotalPotholeCount();
+            long totalCount = potholeService.getTotalPotholeCount();
 
             String result = String.format(
-                    "파이프라인 실행 완료 - 쿼리 ID: %s, 저장된 데이터: %d건, 전체 데이터: %d건",
+                    "파이프라인 실행 완료 - 쿼리 ID: %s, 처리된 데이터: %d건, 전체 데이터: %d건",
                     queryExecutionId, queryResults.size(), totalCount
             );
 
@@ -56,19 +56,6 @@ public class DataProcessingService {
         } catch (Exception e) {
             log.error("S3 → Athena → RDS 파이프라인 실행 중 오류 발생", e);
             throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
-        }
-    }
-
-    // RDS 연결 상태 확인 및 데이터 개수 조회
-    public long getPotholeDataCount() {
-        try {
-            long count = PotholeService.getTotalPotholeCount();
-            log.info("RDS 연결 상태 정상 - 총 데이터: {} 건", count);
-            return count;
-
-        } catch (Exception e) {
-            log.error("RDS 연결 상태 확인 중 오류 발생", e);
-            throw new BusinessException(PotholeErrorCode.RDS_CONNECTION_FAILED);
         }
     }
 }

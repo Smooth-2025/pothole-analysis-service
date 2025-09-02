@@ -28,19 +28,34 @@ public class PotholeService {
             log.info("Athena 쿼리 결과 RDS 저장 시작 - {} 건", queryResults.size());
 
             int savedCount = 0;
+            int duplicateCount = 0;
             int errorCount = 0;
 
             for (Map<String, String> row : queryResults) {
                 try {
+                    String carId = row.get("carid");
+                    Double locationX = parseDouble(row.get("locationx"));
+                    Double locationY = parseDouble(row.get("locationy"));
+                    String detectedAt = formatDateOnly(row.get("timestamp"));
+                    Double impactForce = parseDouble(row.get("impactforce"));
+
+                    // 중복 데이터 체크
+                    if (repository.existsByUniqueFields(carId, locationX, locationY, detectedAt, impactForce)) {
+                        log.debug("중복 데이터 스킵 - carId: {}, location: ({}, {}), date: {}, impact: {}", 
+                                carId, locationX, locationY, detectedAt, impactForce);
+                        duplicateCount++;
+                        continue;
+                    }
+
                     PotholeData entity = PotholeData.builder()
-                            .carId(row.get("carid"))
+                            .carId(carId)
                             .speed(parseDouble(row.get("speed")))
-                            .locationX(parseDouble(row.get("locationx")))
-                            .locationY(parseDouble(row.get("locationy")))
+                            .locationX(locationX)
+                            .locationY(locationY)
                             .s3Url(row.get("s3url"))
-                            .impactForce(parseDouble(row.get("impactforce")))
+                            .impactForce(impactForce)
                             .zAxisVibration(parseDouble(row.get("zaxisvibration")))
-                            .detectedAt(formatDateOnly(row.get("timestamp")))
+                            .detectedAt(detectedAt)
                             .status("unconfirmed") // 기본 상태
                             .build();
 
@@ -54,10 +69,10 @@ public class PotholeService {
             }
 
             long totalCount = repository.count();
-            log.info("RDS 저장 완료 - 성공: {}건, 실패: {}건, 전체: {}건",
-                    savedCount, errorCount, totalCount);
+            log.info("RDS 저장 완료 - 성공: {}건, 중복 스킵: {}건, 실패: {}건, 전체: {}건",
+                    savedCount, duplicateCount, errorCount, totalCount);
 
-            if (savedCount == 0) {
+            if (savedCount == 0 && duplicateCount == 0) {
                 throw new BusinessException(PotholeErrorCode.RDS_DATA_SAVE_FAILED);
             }
 
