@@ -5,7 +5,6 @@ import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequest;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
 import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
