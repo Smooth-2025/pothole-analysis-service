@@ -48,7 +48,7 @@ public class ScheduledDataProcessingService {
 
             DataProcessingResponseDto result = dataProcessingService.queryAndSaveToRds(whereClause);
 
-            log.info("스케줄된 데이터 처리 완료 - {}", result.getMessage());
+            log.info("스케줄된 데이터 처리 완료 - 처리된 데이터: {}건, 전체 데이터: {}건", result.getProcessedDataCount(), result.getTotalDataCount());
 
         } catch (BusinessException e) {
             log.error("스케줄된 데이터 처리 중 비즈니스 오류 발생: {}", e.getMessage());
