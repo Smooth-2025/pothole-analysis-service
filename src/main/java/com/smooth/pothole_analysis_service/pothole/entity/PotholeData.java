@@ -7,7 +7,10 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "pothole_data")
+@Table(name = "pothole_data", 
+       uniqueConstraints = @UniqueConstraint(
+           columnNames = {"car_id", "location_x", "location_y", "detected_at", "impact_force"}
+       ))
 @Data
 @Builder
 @NoArgsConstructor
