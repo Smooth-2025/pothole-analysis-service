@@ -3,6 +3,7 @@ package com.smooth.pothole_analysis_service.pothole.controller;
 import com.smooth.pothole_analysis_service.global.common.ApiResponse;
 import com.smooth.pothole_analysis_service.global.exception.BusinessException;
 import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequestDto;
+import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingResponseDto;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
 import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
@@ -26,7 +27,7 @@ public class DataProcessingController {
      * POST /api/pothole/athena/result-save
      */
     @PostMapping("/result-save")
-    public ResponseEntity<ApiResponse<String>> queryAndSaveToRds(
+    public ResponseEntity<ApiResponse<DataProcessingResponseDto>> queryAndSaveToRds(
             @RequestBody DataProcessingRequestDto requestDto) {
         try {
             Double impact = requestDto.getImpactForceMin();
@@ -36,8 +37,8 @@ public class DataProcessingController {
 
             log.info("S3 → Athena → RDS 파이프라인 시작: {}", whereClause);
 
-            String result = dataProcessingService.queryAndSaveToRds(whereClause);
-            return ResponseEntity.ok(ApiResponse.success(result, "데이터 처리가 완료되었습니다."));
+            DataProcessingResponseDto result = dataProcessingService.queryAndSaveToRds(whereClause);
+            return ResponseEntity.ok(ApiResponse.success("데이터 처리가 완료되었습니다.", result));
 
         } catch (Exception e) {
             log.error("데이터 처리 파이프라인 실행 중 오류 발생", e);

@@ -1,6 +1,7 @@
 package com.smooth.pothole_analysis_service.pothole.service;
 
 import com.smooth.pothole_analysis_service.global.exception.BusinessException;
+import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingResponseDto;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,9 +46,9 @@ public class ScheduledDataProcessingService {
 
             log.info("스케줄된 데이터 처리 시작 - WHERE: {}", whereClause);
 
-            String result = dataProcessingService.queryAndSaveToRds(whereClause);
+            DataProcessingResponseDto result = dataProcessingService.queryAndSaveToRds(whereClause);
 
-            log.info("스케줄된 데이터 처리 완료 - {}", result);
+            log.info("스케줄된 데이터 처리 완료 - {}", result.getMessage());
 
         } catch (BusinessException e) {
             log.error("스케줄된 데이터 처리 중 비즈니스 오류 발생: {}", e.getMessage());
