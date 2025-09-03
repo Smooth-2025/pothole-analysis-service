@@ -32,7 +32,13 @@ public class DataProcessingService {
             log.info("Athena에서 {} 건의 데이터 조회 완료", queryResults.size());
 
             if (queryResults.isEmpty()) {
-                throw new BusinessException(PotholeErrorCode.EMPTY_QUERY_RESULT);
+                log.warn("해당 기간에 데이터가 없습니다.");
+                String result = String.format(
+                        "파이프라인 실행 완료 - 쿼리 ID: %s, 처리된 데이터: 0건 (해당 기간 데이터 없음)",
+                        queryExecutionId
+                );
+                log.info("S3 → Athena → RDS 파이프라인 완료: {}", result);
+                return result;
             }
 
             // 3. RDS에 데이터 저장
