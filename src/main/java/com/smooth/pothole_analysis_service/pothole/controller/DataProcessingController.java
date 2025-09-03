@@ -1,6 +1,7 @@
 package com.smooth.pothole_analysis_service.pothole.controller;
 
 import com.smooth.pothole_analysis_service.global.common.ApiResponse;
+import com.smooth.pothole_analysis_service.global.exception.BusinessException;
 import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequestDto;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
@@ -50,17 +51,16 @@ public class DataProcessingController {
      * POST /api/pothole/athena/run-scheduler
      */
     @PostMapping("/run-scheduler")
-    public ResponseEntity<ApiResponse<String>> runSchedulerManually() {
+    public ResponseEntity<ApiResponse<Void>> runSchedulerManually() {
         try {
             log.info("스케줄러 수동 실행 요청");
             scheduledDataProcessingService.executeManually();
             
-            return ResponseEntity.ok(ApiResponse.success("스케줄러가 수동으로 실행되었습니다.", "SUCCESS"));
+            return ResponseEntity.ok(ApiResponse.success("스케줄러가 수동으로 실행되었습니다."));
 
         } catch (Exception e) {
             log.error("스케줄러 수동 실행 중 오류 발생", e);
-            return ResponseEntity.status(PotholeErrorCode.SCHEDULER_EXECUTION_FAILED.getHttpStatus())
-                    .body(ApiResponse.error(PotholeErrorCode.SCHEDULER_EXECUTION_FAILED));
+            throw new BusinessException(PotholeErrorCode.SCHEDULER_EXECUTION_FAILED);
         }
     }
 }
