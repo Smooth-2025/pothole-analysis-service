@@ -1,7 +1,7 @@
 package com.smooth.pothole_analysis_service.pothole.controller;
 
 import com.smooth.pothole_analysis_service.global.common.ApiResponse;
-import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequest;
+import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequestDto;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
 import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
@@ -26,7 +26,7 @@ public class DataProcessingController {
      */
     @PostMapping("/result-save")
     public ResponseEntity<ApiResponse<String>> queryAndSaveToRds(
-            @RequestBody DataProcessingRequest requestDto) {
+            @RequestBody DataProcessingRequestDto requestDto) {
         try {
             Double impact = requestDto.getImpactForceMin();
             Double zVib = requestDto.getZAxisVibrationMin();

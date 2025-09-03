@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class DataProcessingRequest {
+public class DataProcessingRequestDto {
     @NotNull(message = "impactForceMin 값은 필수입니다")
     @JsonProperty("impactForceMin")
     private Double impactForceMin;
