@@ -21,16 +21,16 @@ public class AthenaQueryService {
 
     private final AthenaClient athenaClient;
 
-    @Value("${aws.athena.database:pothole}")
+    @Value("${aws.athena.database}")
     private String database;
 
-    @Value("${aws.athena.output-location:s3://bucket-of-smooth/pothole/athena-result/}")
+    @Value("${aws.athena.output-location}")
     private String outputLocation;
 
-    @Value("${aws.athena.workgroup:primary}")
+    @Value("${aws.athena.workgroup}")
     private String workgroup;
 
-    @Value("${aws.athena.tables.raw-pothole-data:pothole_data}")
+    @Value("${aws.athena.tables.raw-pothole-data}")
     private String rawPotholeDataTable;
 
     // S3 데이터에 대한 Athena 쿼리 실행
