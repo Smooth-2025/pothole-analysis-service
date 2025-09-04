@@ -15,10 +15,7 @@ services:
 
   # 백엔드 애플리케이션 컨테이너 정의 (수정)
   backend:
-    # 도커 허브 이미지를 사용하도록 지정
-    #image: 131c/user-service:0.0.1
-    # ECR 이미지를 사용하도록 지정
-    image: 933090817123.dkr.ecr.ap-northeast-2.amazonaws.com/smooth/pothole-analysis-service:0.0.1
+    image: ${AWS_ACCOUNT_ID}.dkr.ecr.ap-northeast-2.amazonaws.com/smooth/pothole-analysis-service:0.0.1
     container_name: smooth-backend
     ports:
       - "8080:8080"
