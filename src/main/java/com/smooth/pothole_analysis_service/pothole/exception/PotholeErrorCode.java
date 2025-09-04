@@ -31,17 +31,17 @@ public enum PotholeErrorCode implements ErrorCode {
     DATA_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 5033, "데이터 처리 중 오류가 발생했습니다."),
     DUPLICATE_DATA_DETECTED(HttpStatus.CONFLICT, 5034, "중복된 데이터가 감지되었습니다."),
 
+    // AWS 서비스 관련
+    AWS_CREDENTIALS_INVALID(HttpStatus.UNAUTHORIZED, 5041, "AWS 인증 정보가 유효하지 않습니다."),
+    AWS_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 5042, "AWS 서비스를 사용할 수 없습니다."),
+
     // 스케줄링 관련
     SCHEDULER_EXECUTION_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, 5051, "스케줄러 실행에 실패했습니다."),
     SCHEDULER_ALREADY_RUNNING(HttpStatus.CONFLICT, 5052, "스케줄러가 이미 실행 중입니다."),
 
     // 요청 검증 관련
     INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, 5061, "잘못된 요청 파라미터입니다."),
-    MISSING_REQUIRED_FIELD(HttpStatus.BAD_REQUEST, 5062, "필수 필드가 누락되었습니다."),
-
-    // AWS 서비스 관련
-    AWS_CREDENTIALS_INVALID(HttpStatus.UNAUTHORIZED, 5041, "AWS 인증 정보가 유효하지 않습니다."),
-    AWS_SERVICE_UNAVAILABLE(HttpStatus.SERVICE_UNAVAILABLE, 5042, "AWS 서비스를 사용할 수 없습니다.");
+    MISSING_REQUIRED_FIELD(HttpStatus.BAD_REQUEST, 5062, "필수 필드가 누락되었습니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;
