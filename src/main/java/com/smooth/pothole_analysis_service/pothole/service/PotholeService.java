@@ -96,6 +96,50 @@ public class PotholeService {
         }
     }
 
+    // 포트홀 확정 처리
+    @Transactional
+    public void confirmPothole(String potholeId) {
+        try {
+            // potholeId에서 숫자 부분 추출 (p-1234567890 -> 1234567890)
+            Long id = extractIdFromPotholeId(potholeId);
+            
+            // 포트홀 데이터 조회
+            PotholeData potholeData = repository.findById(id)
+                    .orElseThrow(() -> new BusinessException(PotholeErrorCode.POTHOLE_NOT_FOUND));
+            
+            // 이미 확정된 포트홀인지 확인
+            if ("confirmed".equals(potholeData.getStatus())) {
+                throw new BusinessException(PotholeErrorCode.POTHOLE_ALREADY_CONFIRMED);
+            }
+            
+            // 상태를 confirmed로 변경
+            potholeData.setStatus("confirmed");
+            repository.save(potholeData);
+            
+            log.info("포트홀 확정 처리 완료 - ID: {}", potholeId);
+            
+        } catch (BusinessException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("포트홀 확정 처리 중 오류 발생 - ID: {}", potholeId, e);
+            throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
+        }
+    }
+    
+    // potholeId에서 숫자 ID 추출 (p-1234567890 -> 1234567890)
+    private Long extractIdFromPotholeId(String potholeId) {
+        if (potholeId == null || !potholeId.startsWith("p-")) {
+            throw new BusinessException(PotholeErrorCode.INVALID_REQUEST_PARAMETER);
+        }
+        
+        try {
+            String numericPart = potholeId.substring(2); // "p-" 제거
+            return Long.parseLong(numericPart);
+        } catch (NumberFormatException e) {
+            throw new BusinessException(PotholeErrorCode.INVALID_REQUEST_PARAMETER);
+        }
+    }
+
     // 숫자 문자열을 Double로 변환 (속도, 위치, 충격량, z축 흔들림 데이터)
     private Double parseDouble(String value) {
         if (value == null || value.trim().isEmpty()) {

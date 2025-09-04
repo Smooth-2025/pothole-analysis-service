@@ -85,7 +85,7 @@ public class PotholeQueryService {
     
     private PotholeQueryResponseDto.UserDto getUserInfo(String carId) {
         try {
-            UserResponseDto userResponse = userServiceClient.getUserById(carId);
+            UserResponseDto userResponse = userServiceClient.getUserById(Long.valueOf(carId));
             return PotholeQueryResponseDto.UserDto.builder()
                 .userId(userResponse.getUserId())
                 .userName(userResponse.getUserName())
