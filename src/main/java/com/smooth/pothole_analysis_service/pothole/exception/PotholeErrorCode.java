@@ -41,7 +41,11 @@ public enum PotholeErrorCode implements ErrorCode {
 
     // 요청 검증 관련
     INVALID_REQUEST_PARAMETER(HttpStatus.BAD_REQUEST, 5061, "잘못된 요청 파라미터입니다."),
-    MISSING_REQUIRED_FIELD(HttpStatus.BAD_REQUEST, 5062, "필수 필드가 누락되었습니다.");
+    MISSING_REQUIRED_FIELD(HttpStatus.BAD_REQUEST, 5062, "필수 필드가 누락되었습니다."),
+
+    // 포트홀 확정 관련
+    POTHOLE_NOT_FOUND(HttpStatus.NOT_FOUND, 5071, "포트홀 데이터를 찾을 수 없습니다."),
+    POTHOLE_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, 5072, "이미 확정된 포트홀입니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;

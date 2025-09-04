@@ -5,9 +5,11 @@ import com.smooth.pothole_analysis_service.global.exception.BusinessException;
 import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequestDto;
 import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingResponseDto;
 import com.smooth.pothole_analysis_service.pothole.dto.PotholeQueryResponseDto;
+import com.smooth.pothole_analysis_service.pothole.dto.PotholeConfirmRequestDto;
 import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
 import com.smooth.pothole_analysis_service.pothole.service.PotholeQueryService;
+import com.smooth.pothole_analysis_service.pothole.service.PotholeService;
 import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 
 // 포트홀 데이터 처리 컨트롤러 [S3 데이터 → Athena 쿼리 → RDS 저장 파이프라인]
-
 @Slf4j
 @RestController
 @RequestMapping("/api/pothole")
@@ -27,9 +28,9 @@ public class DataProcessingController {
     private final DataProcessingService dataProcessingService;
     private final ScheduledDataProcessingService scheduledDataProcessingService;
     private final PotholeQueryService potholeQueryService;
+    private final PotholeService potholeService;
 
     // Athena 쿼리 실행 후 결과를 RDS에 저장
-
     @PostMapping("/athena/result-save")
     public ResponseEntity<ApiResponse<DataProcessingResponseDto>> queryAndSaveToRds(
             @RequestBody DataProcessingRequestDto requestDto) {
@@ -52,7 +53,6 @@ public class DataProcessingController {
     }
 
     // 스케줄러를 수동으로 실행 (테스트용)
-
     @PostMapping("/athena/run-scheduler")
     public ResponseEntity<ApiResponse<Void>> runSchedulerManually() {
         try {
@@ -90,5 +90,15 @@ public class DataProcessingController {
             log.error("포트홀 데이터 조회 중 오류 발생", e);
             throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
         }
+    }
+
+    // 포트홀 확정 처리 API
+    @PostMapping("/data/confirm")
+    public ResponseEntity<ApiResponse<Void>> confirmPothole(@RequestBody PotholeConfirmRequestDto requestDto) {
+        log.info("포트홀 확정 처리 요청: potholeId={}", requestDto.getPotholeId());
+        
+        potholeService.confirmPothole(requestDto.getPotholeId());
+        
+        return ResponseEntity.ok(ApiResponse.success("포트홀 확정 처리가 완료되었습니다."));
     }
 }
