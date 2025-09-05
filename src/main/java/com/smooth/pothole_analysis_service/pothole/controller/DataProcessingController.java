@@ -14,7 +14,6 @@ import com.smooth.pothole_analysis_service.pothole.service.PotholeService;
 import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
@@ -68,25 +67,30 @@ public class DataProcessingController {
         }
     }
 
-    // 포트홀 데이터 조회 API
     @GetMapping("/data")
     public ResponseEntity<ApiResponse<PotholeQueryResponseDto>> getPotholeData(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate start,
-            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate end,
-            @RequestParam(required = false) Boolean confirmed) {
-        
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end,
+            @RequestParam(required = false) String confirmed) {
+
         try {
-            // 기본값 설정
-            LocalDate defaultStart = start != null ? start : LocalDate.of(2025, 8, 1);
-            LocalDate defaultEnd = end != null ? end : LocalDate.of(2099, 12, 31);
-            
-            log.info("포트홀 데이터 조회 요청: page={}, start={}, end={}, confirmed={}", 
-                    page, defaultStart, defaultEnd, confirmed);
-            
-            PotholeQueryResponseDto data = potholeQueryService.getPotholeData(page, defaultStart, defaultEnd, confirmed);
+            LocalDate defaultStart = (start != null && !"null".equalsIgnoreCase(start) && !start.isBlank())
+                    ? LocalDate.parse(start)
+                    : LocalDate.of(2025, 8, 1);
+            LocalDate defaultEnd = (end != null && !"null".equalsIgnoreCase(end) && !end.isBlank())
+                    ? LocalDate.parse(end)
+                    : LocalDate.of(2099, 12, 31);
+
+            Boolean confirmedValue = (confirmed != null && !"null".equalsIgnoreCase(confirmed))
+                    ? Boolean.parseBoolean(confirmed)
+                    : null;
+            log.info("포트홀 데이터 조회 요청: page={}, start={}, end={}, confirmed={}",
+                    page, defaultStart, defaultEnd, confirmedValue);
+            PotholeQueryResponseDto data =
+                    potholeQueryService.getPotholeData(page, defaultStart, defaultEnd, confirmedValue);
+
             return ResponseEntity.ok(ApiResponse.success("포트홀 목록 조회 성공", data));
-            
         } catch (Exception e) {
             log.error("포트홀 데이터 조회 중 오류 발생", e);
             throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
