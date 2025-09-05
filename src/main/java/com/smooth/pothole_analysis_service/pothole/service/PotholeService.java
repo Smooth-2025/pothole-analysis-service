@@ -20,6 +20,7 @@ import java.util.Map;
 public class PotholeService {
 
     private final PotholeDataRepository repository;
+    private final CoordinateConversionService coordinateConversionService;
 
     // Athena 쿼리 결과를 RDS에 저장
     @Transactional
@@ -39,6 +40,11 @@ public class PotholeService {
                     String detectedAt = formatDateOnly(row.get("timestamp"));
                     Double impactForce = parseDouble(row.get("impactforce"));
 
+                    // Carla 좌표를 위도/경도로 변환
+                    double[] latLon = coordinateConversionService.convertToLatLon(locationX, locationY);
+                    Double longitude = latLon[0];
+                    Double latitude = latLon[1];
+
                     // 중복 데이터 체크
                     if (repository.existsByUniqueFields(carId, locationX, locationY, detectedAt, impactForce)) {
                         log.debug("중복 데이터 스킵 - carId: {}, location: ({}, {}), date: {}, impact: {}", 
@@ -52,12 +58,17 @@ public class PotholeService {
                             .speed(parseDouble(row.get("speed")))
                             .locationX(locationX)
                             .locationY(locationY)
+                            .longitude(longitude)
+                            .latitude(latitude)
                             .s3Url(row.get("s3url"))
                             .impactForce(impactForce)
                             .zAxisVibration(parseDouble(row.get("zaxisvibration")))
                             .detectedAt(detectedAt)
                             .status("unconfirmed") // 기본 상태
                             .build();
+
+                    log.debug("좌표 변환 완료 - Carla({}, {}) -> GPS({}, {})", 
+                             locationX, locationY, longitude, latitude);
 
                     repository.save(entity);
                     savedCount++;
