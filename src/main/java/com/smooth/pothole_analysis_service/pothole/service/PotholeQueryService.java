@@ -24,7 +24,6 @@ public class PotholeQueryService {
     
     private final PotholeDataRepository potholeDataRepository;
     private final UserServiceClient userServiceClient;
-    private final CoordinateConversionService coordinateConversionService;
     
     public PotholeQueryResponseDto getPotholeData(int page, LocalDate start, LocalDate end, Boolean confirmed) {
         Pageable pageable = PageRequest.of(page, 10); // 페이지당 10개
@@ -57,17 +56,16 @@ public class PotholeQueryService {
     }
     
     private PotholeQueryResponseDto.PotholeContentDto convertToPotholeContentDto(PotholeData potholeData) {
-        // 좌표 변환
-        double[] latLon = coordinateConversionService.convertToLatLon(
-            potholeData.getLocationX(), potholeData.getLocationY());
-        
         // 사용자 정보 조회
         PotholeQueryResponseDto.UserDto userDto = getUserInfo(potholeData.getCarId());
         
+        Double latitude = potholeData.getLatitude();
+        Double longitude = potholeData.getLongitude();
+
         // 위치 정보 생성
         PotholeQueryResponseDto.LocationDto locationDto = PotholeQueryResponseDto.LocationDto.builder()
-            .latitude(latLon[1])  // 위도
-            .longitude(latLon[0]) // 경도
+            .latitude(latitude)
+            .longitude(longitude)
             .build();
         
         return PotholeQueryResponseDto.PotholeContentDto.builder()

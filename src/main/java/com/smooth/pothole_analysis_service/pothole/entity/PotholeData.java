@@ -33,6 +33,12 @@ public class PotholeData {
     @Column(name = "location_y")
     private Double locationY;
 
+    @Column(name = "longitude")
+    private Double longitude;
+
+    @Column(name = "latitude")
+    private Double latitude;
+
     @Column(name = "s3_url")
     private String s3Url;
 
