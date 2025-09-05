@@ -45,7 +45,11 @@ public enum PotholeErrorCode implements ErrorCode {
 
     // 포트홀 확정 관련
     POTHOLE_NOT_FOUND(HttpStatus.NOT_FOUND, 5071, "포트홀 데이터를 찾을 수 없습니다."),
-    POTHOLE_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, 5072, "이미 확정된 포트홀입니다.");
+    POTHOLE_ALREADY_CONFIRMED(HttpStatus.BAD_REQUEST, 5072, "이미 확정된 포트홀입니다."),
+
+    // 사용자 권한 관련
+    UNAUTHORIZED(HttpStatus.UNAUTHORIZED, 5081, "인증되지 않은 사용자입니다."),
+    ADMIN_PERMISSION_REQUIRED(HttpStatus.FORBIDDEN, 5082, "관리자 권한이 필요합니다.");
 
     private final HttpStatus httpStatus;
     private final Integer code;

@@ -1,5 +1,6 @@
 package com.smooth.pothole_analysis_service.pothole.controller;
 
+import com.smooth.pothole_analysis_service.global.auth.AuthenticationUtils;
 import com.smooth.pothole_analysis_service.global.common.ApiResponse;
 import com.smooth.pothole_analysis_service.global.exception.BusinessException;
 import com.smooth.pothole_analysis_service.pothole.dto.DataProcessingRequestDto;
@@ -96,6 +97,12 @@ public class DataProcessingController {
     @PostMapping("/data/confirm")
     public ResponseEntity<ApiResponse<Void>> confirmPothole(@RequestBody PotholeConfirmRequestDto requestDto) {
         log.info("포트홀 확정 처리 요청: potholeId={}", requestDto.getPotholeId());
+
+        if (!AuthenticationUtils.isAdmin()) {
+            log.warn("관리자가 아닌 사용자의 포트홀 확정 처리 시도: userId={}, role={}",
+                    AuthenticationUtils.getCurrentUserId(), AuthenticationUtils.getCurrentUserRole());
+            throw new BusinessException(PotholeErrorCode.ADMIN_PERMISSION_REQUIRED);
+        }
         
         potholeService.confirmPothole(requestDto.getPotholeId());
         
