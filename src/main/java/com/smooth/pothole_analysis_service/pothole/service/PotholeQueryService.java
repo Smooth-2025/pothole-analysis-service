@@ -54,6 +54,28 @@ public class PotholeQueryService {
             .totalPages(potholeDataPage.getTotalPages())
             .build();
     }
+
+    public List<PotholeQueryResponseDto.PotholeContentDto> getAllPotholeData(LocalDate start, LocalDate end, Boolean confirmed) {
+        String startStr = start.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+        String endStr = end.format(DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+        Pageable unpaged = Pageable.unpaged();
+        Page<PotholeData> potholeDataPage;
+
+        if (confirmed != null) {
+            String status = confirmed ? "confirmed" : "unconfirmed";
+            potholeDataPage = potholeDataRepository.findByDetectedAtBetweenAndStatus(
+                    startStr, endStr, status, unpaged);
+        } else {
+            potholeDataPage = potholeDataRepository.findByDetectedAtBetween(
+                    startStr, endStr, unpaged);
+        }
+
+        return potholeDataPage.getContent()
+                .stream()
+                .map(this::convertToPotholeContentDto)
+                .collect(Collectors.toList());
+    }
     
     private PotholeQueryResponseDto.PotholeContentDto convertToPotholeContentDto(PotholeData potholeData) {
         // 사용자 정보 조회

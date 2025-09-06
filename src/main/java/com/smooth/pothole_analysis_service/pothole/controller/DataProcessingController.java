@@ -17,6 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
 
 // 포트홀 데이터 처리 컨트롤러 [S3 데이터 → Athena 쿼리 → RDS 저장 파이프라인]
 @Slf4j
@@ -80,7 +82,7 @@ public class DataProcessingController {
                     : LocalDate.of(2025, 8, 1);
             LocalDate defaultEnd = (end != null && !"null".equalsIgnoreCase(end) && !end.isBlank())
                     ? LocalDate.parse(end)
-                    : LocalDate.of(2099, 12, 31);
+                    : LocalDate.now(ZoneId.of("Asia/Seoul"));
 
             Boolean confirmedValue = (confirmed != null && !"null".equalsIgnoreCase(confirmed))
                     ? Boolean.parseBoolean(confirmed)
@@ -93,6 +95,37 @@ public class DataProcessingController {
             return ResponseEntity.ok(ApiResponse.success("포트홀 목록 조회 성공", data));
         } catch (Exception e) {
             log.error("포트홀 데이터 조회 중 오류 발생", e);
+            throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
+        }
+    }
+
+    @GetMapping("/data/all")
+    public ResponseEntity<ApiResponse<List<PotholeQueryResponseDto.PotholeContentDto>>> getAllPotholeData(
+            @RequestParam(required = false) String start,
+            @RequestParam(required = false) String end,
+            @RequestParam(required = false) String confirmed) {
+
+        try {
+            LocalDate defaultStart = (start != null && !"null".equalsIgnoreCase(start) && !start.isBlank())
+                    ? LocalDate.parse(start)
+                    : LocalDate.of(2025, 8, 1);
+            LocalDate defaultEnd = (end != null && !"null".equalsIgnoreCase(end) && !end.isBlank())
+                    ? LocalDate.parse(end)
+                    : LocalDate.of(2099, 12, 31);
+
+            Boolean confirmedValue = (confirmed != null && !"null".equalsIgnoreCase(confirmed))
+                    ? Boolean.parseBoolean(confirmed)
+                    : null;
+
+            log.info("전체 포트홀 데이터 조회 요청: start={}, end={}, confirmed={}",
+                    defaultStart, defaultEnd, confirmedValue);
+
+            List<PotholeQueryResponseDto.PotholeContentDto> data =
+                    potholeQueryService.getAllPotholeData(defaultStart, defaultEnd, confirmedValue);
+
+            return ResponseEntity.ok(ApiResponse.success("전체 포트홀 목록 조회 성공", data));
+        } catch (Exception e) {
+            log.error("전체 포트홀 데이터 조회 중 오류 발생", e);
             throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
         }
     }
