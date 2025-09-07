@@ -34,10 +34,9 @@ public class PotholeQueryService {
         Page<PotholeData> potholeDataPage;
         
         if (confirmed != null) {
-            // confirmed 상태에 따른 필터링 (예: "confirmed" 또는 "unconfirmed" 상태)
-            String status = confirmed ? "confirmed" : "unconfirmed";
+            // confirmed 상태에 따른 필터링 (true 또는 false 상태)
             potholeDataPage = potholeDataRepository.findByDetectedAtBetweenAndStatus(
-                startStr, endStr, status, pageable);
+                startStr, endStr, confirmed, pageable);
         } else {
             potholeDataPage = potholeDataRepository.findByDetectedAtBetween(
                 startStr, endStr, pageable);
@@ -63,9 +62,8 @@ public class PotholeQueryService {
         Page<PotholeData> potholeDataPage;
 
         if (confirmed != null) {
-            String status = confirmed ? "confirmed" : "unconfirmed";
             potholeDataPage = potholeDataRepository.findByDetectedAtBetweenAndStatus(
-                    startStr, endStr, status, unpaged);
+                    startStr, endStr, confirmed, unpaged);
         } else {
             potholeDataPage = potholeDataRepository.findByDetectedAtBetween(
                     startStr, endStr, unpaged);
@@ -99,7 +97,7 @@ public class PotholeQueryService {
             .shake(potholeData.getZAxisVibration())
             .speed(potholeData.getSpeed())
             .imageUrl(potholeData.getS3Url())
-            .confirmed("confirmed".equals(potholeData.getStatus()))
+            .confirmed(Boolean.TRUE.equals(potholeData.getStatus()))
             .build();
     }
     
