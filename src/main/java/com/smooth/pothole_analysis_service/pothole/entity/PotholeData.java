@@ -52,5 +52,5 @@ public class PotholeData {
     private String detectedAt;
 
     @Column(name = "status")
-    private String status;
+    private Boolean status;
 }

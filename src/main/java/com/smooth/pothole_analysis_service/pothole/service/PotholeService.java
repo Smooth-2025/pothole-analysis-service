@@ -47,7 +47,7 @@ public class PotholeService {
 
                     // 중복 데이터 체크
                     if (repository.existsByUniqueFields(carId, locationX, locationY, detectedAt, impactForce)) {
-                        log.debug("중복 데이터 스킵 - carId: {}, location: ({}, {}), date: {}, impact: {}", 
+                        log.debug("중복 데이터 스킵 - carId: {}, location: ({}, {}), date: {}, impact: {}",
                                 carId, locationX, locationY, detectedAt, impactForce);
                         duplicateCount++;
                         continue;
@@ -64,10 +64,10 @@ public class PotholeService {
                             .impactForce(impactForce)
                             .zAxisVibration(parseDouble(row.get("zaxisvibration")))
                             .detectedAt(detectedAt)
-                            .status("unconfirmed") // 기본 상태
+                            .status(false) // 기본 상태 (false = 미확정)
                             .build();
 
-                    log.debug("좌표 변환 완료 - Carla({}, {}) -> GPS({}, {})", 
+                    log.debug("좌표 변환 완료 - Carla({}, {}) -> GPS({}, {})",
                              locationX, locationY, longitude, latitude);
 
                     repository.save(entity);
@@ -107,36 +107,34 @@ public class PotholeService {
         }
     }
 
-    // 포트홀 확정 처리
+    // 포트홀 상태 토글 처리 (확정 <-> 미확정)
     @Transactional
     public void confirmPothole(String potholeId) {
         try {
             // potholeId에서 숫자 부분 추출 (p-1234567890 -> 1234567890)
             Long id = extractIdFromPotholeId(potholeId);
-            
+
             // 포트홀 데이터 조회
             PotholeData potholeData = repository.findById(id)
                     .orElseThrow(() -> new BusinessException(PotholeErrorCode.POTHOLE_NOT_FOUND));
-            
-            // 이미 확정된 포트홀인지 확인
-            if ("confirmed".equals(potholeData.getStatus())) {
-                throw new BusinessException(PotholeErrorCode.POTHOLE_ALREADY_CONFIRMED);
-            }
-            
-            // 상태를 confirmed로 변경
-            potholeData.setStatus("confirmed");
+
+            // 현재 상태를 반대로 토글
+            boolean currentStatus = Boolean.TRUE.equals(potholeData.getStatus());
+            boolean newStatus = !currentStatus;
+
+            potholeData.setStatus(newStatus);
             repository.save(potholeData);
-            
-            log.info("포트홀 확정 처리 완료 - ID: {}", potholeId);
-            
+
+            String statusMessage = newStatus ? "확정" : "미확정";
+            log.info("포트홀 상태 변경 완료 - ID: {}, 상태: {}", potholeId, statusMessage);
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {
-            log.error("포트홀 확정 처리 중 오류 발생 - ID: {}", potholeId, e);
+            log.error("포트홀 상태 변경 중 오류 발생 - ID: {}", potholeId, e);
             throw new BusinessException(PotholeErrorCode.DATA_PROCESSING_FAILED);
         }
     }
-    
+
     // potholeId에서 숫자 ID 추출 (p-1234567890 -> 1234567890)
     private Long extractIdFromPotholeId(String potholeId) {
         if (potholeId == null || !potholeId.startsWith("p-")) {

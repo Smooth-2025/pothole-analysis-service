@@ -143,6 +143,6 @@ public class DataProcessingController {
         
         potholeService.confirmPothole(requestDto.getPotholeId());
         
-        return ResponseEntity.ok(ApiResponse.success("포트홀 확정 처리가 완료되었습니다."));
+        return ResponseEntity.ok(ApiResponse.success("포트홀 상태 처리가 완료되었습니다."));
     }
 }
