@@ -51,6 +51,6 @@ public class PotholeData {
     @Column(name = "detected_at")
     private String detectedAt;
 
-    @Column(name = "status")
+    @Column(name = "status", columnDefinition = "TINYINT(1)")
     private Boolean status;
 }
