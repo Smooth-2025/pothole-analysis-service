@@ -20,7 +20,7 @@ public class ScheduledDataProcessingService {
     private volatile boolean isRunning = false;
 
     // 매일 02시에 전날 데이터를 처리하는 스케줄러
-    @Scheduled(cron = "0 17 15 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 51 15 * * *", zone = "Asia/Seoul")
     public void processYesterdayData() {
         if (isRunning) {
             log.warn("스케줄러가 이미 실행 중입니다. 중복 실행을 방지합니다.");
