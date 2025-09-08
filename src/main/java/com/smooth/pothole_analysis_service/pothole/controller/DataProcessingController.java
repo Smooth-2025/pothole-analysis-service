@@ -11,7 +11,6 @@ import com.smooth.pothole_analysis_service.pothole.exception.PotholeErrorCode;
 import com.smooth.pothole_analysis_service.pothole.service.DataProcessingService;
 import com.smooth.pothole_analysis_service.pothole.service.PotholeQueryService;
 import com.smooth.pothole_analysis_service.pothole.service.PotholeService;
-import com.smooth.pothole_analysis_service.pothole.service.ScheduledDataProcessingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -28,7 +27,6 @@ import java.util.List;
 public class DataProcessingController {
 
     private final DataProcessingService dataProcessingService;
-    private final ScheduledDataProcessingService scheduledDataProcessingService;
     private final PotholeQueryService potholeQueryService;
     private final PotholeService potholeService;
 
@@ -51,21 +49,6 @@ public class DataProcessingController {
             log.error("데이터 처리 파이프라인 실행 중 오류 발생", e);
             return ResponseEntity.internalServerError()
                     .body(ApiResponse.error(PotholeErrorCode.DATA_PROCESSING_FAILED));
-        }
-    }
-
-    // 스케줄러를 수동으로 실행 (테스트용)
-    @PostMapping("/athena/run-scheduler")
-    public ResponseEntity<ApiResponse<Void>> runSchedulerManually() {
-        try {
-            log.info("스케줄러 수동 실행 요청");
-            scheduledDataProcessingService.executeManually();
-            
-            return ResponseEntity.ok(ApiResponse.success("스케줄러가 수동으로 실행되었습니다."));
-
-        } catch (Exception e) {
-            log.error("스케줄러 수동 실행 중 오류 발생", e);
-            throw new BusinessException(PotholeErrorCode.SCHEDULER_EXECUTION_FAILED);
         }
     }
 
