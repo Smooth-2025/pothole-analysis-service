@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: pothole-analysis-service
+
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MYSQL;DATABASE_TO_UPPER=false
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+cloud:
+  aws:
+    credentials:
+      access-key: dummy
+      secret-key: dummy
+    region:
+      static: ap-northeast-2
+    stack:
+      auto: false
+
+aws:
+  athena:
+    database: pothole
+    output-location: s3://dummy-bucket/athena-result/pothole
+    workgroup: primary
+    tables:
+      raw-pothole-data: dummy_data
+
+user:
+  service:
+    url: http://localhost:8081
